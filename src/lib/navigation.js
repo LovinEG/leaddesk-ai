@@ -46,12 +46,14 @@ const DEFAULT_PAGE = {
 }
 
 export function getPageMeta(pathname) {
-  if (pathname.startsWith('/leads/')) {
-    const leadId = pathname.slice('/leads/'.length)
+  const leadId = pathname.startsWith('/leads/')
+    ? pathname.slice('/leads/'.length)
+    : ''
 
+  if (leadId !== '') {
     return {
       label: 'Lead',
-      description: leadId ? `Лид #${leadId}` : 'Карточка лида',
+      description: `Лид #${leadId}`,
     }
   }
 

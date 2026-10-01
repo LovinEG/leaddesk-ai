@@ -1,0 +1,78 @@
+.lead-score {
+  --card-padding: 18px 20px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.lead-score__header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.lead-score__icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--color-border-soft);
+  border-radius: 9px;
+  background-color: var(--color-violet-soft);
+  color: var(--color-violet-ink);
+}
+
+.lead-score__title {
+  font-size: 14px;
+  font-weight: 620;
+}
+
+.lead-score__value {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin: 0;
+}
+
+.lead-score__number {
+  font-size: 30px;
+  font-weight: 620;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--color-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.lead-score__total {
+  font-size: 13px;
+  color: var(--color-text-soft);
+}
+
+/* Прогресс-бар с blue-purple градиентом */
+.lead-score__bar {
+  height: 8px;
+  border-radius: var(--radius-full);
+  background-color: rgba(148, 163, 184, 0.12);
+  overflow: hidden;
+}
+
+.lead-score__fill {
+  display: block;
+  height: 100%;
+  border-radius: var(--radius-full);
+  background-image: linear-gradient(
+    90deg,
+    var(--color-blue) 0%,
+    var(--color-violet) 58%,
+    var(--color-purple) 100%
+  );
+  box-shadow: 0 0 12px rgba(124, 58, 237, 0.45);
+}
+
+.lead-score__label {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--color-text-muted);
+}

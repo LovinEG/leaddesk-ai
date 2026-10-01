@@ -1,0 +1,78 @@
+.lead-timeline {
+  --card-padding: 18px 20px;
+}
+
+.lead-timeline__header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.lead-timeline__icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--color-border-soft);
+  border-radius: 9px;
+  background-color: var(--color-cyan-soft);
+  color: var(--color-cyan-ink);
+}
+
+.lead-timeline__title {
+  font-size: 14px;
+  font-weight: 620;
+}
+
+/* Вертикальный timeline */
+.lead-timeline__list {
+  margin-top: 16px;
+}
+
+.lead-timeline__item {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 12px;
+  padding: 0 0 14px 22px;
+}
+
+.lead-timeline__item:last-child {
+  padding-bottom: 0;
+}
+
+/* Соединительная линия */
+.lead-timeline__item:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 16px;
+  width: 1px;
+  height: calc(100% - 14px);
+  background-color: var(--color-border);
+}
+
+.lead-timeline__dot {
+  position: absolute;
+  left: 0;
+  top: 4px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background-image: var(--gradient-brand);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.14);
+}
+
+.lead-timeline__text {
+  font-size: 13px;
+  color: var(--color-text);
+}
+
+.lead-timeline__time {
+  font-size: 11.5px;
+  color: var(--color-text-soft);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}

@@ -1,0 +1,84 @@
+.lead-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 1180px;
+}
+
+/* Сетка: AI-сводка | Качество лида, параметры на всю ширину, заметки | история */
+.lead-page__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.lead-page__span {
+  grid-column: 1 / -1;
+  min-width: 0;
+}
+
+/* Empty state */
+.lead-page__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  max-width: 420px;
+  margin: 40px auto 0;
+  padding: 34px 24px 30px;
+  background-color: var(--color-card);
+  border: 1px solid var(--color-border-soft);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  text-align: center;
+  color: var(--color-text-soft);
+}
+
+.lead-page__empty-title {
+  margin: 10px 0 0;
+  font-size: 15px;
+  font-weight: 620;
+  color: var(--color-text);
+}
+
+.lead-page__empty-text {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--color-text-soft);
+}
+
+.lead-page__empty-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  margin-top: 16px;
+  padding: 0 14px;
+  background-image: var(--gradient-brand);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 10px;
+  color: #ffffff;
+  font-size: 12.5px;
+  font-weight: 600;
+  box-shadow: var(--glow-violet);
+  transition:
+    background-image 160ms ease,
+    transform 160ms ease;
+}
+
+.lead-page__empty-link:hover {
+  background-image: var(--gradient-brand-hover);
+  transform: translateY(-1px);
+}
+
+/* Планшет: одна колонка, порядок блоков сохраняется */
+@media (max-width: 1000px) {
+  .lead-page__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .lead-page__empty {
+    margin-top: 24px;
+  }
+}
