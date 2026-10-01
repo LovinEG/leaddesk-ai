@@ -1,0 +1,262 @@
+.dialog-list {
+  --card-padding: 0;
+
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Шапка списка */
+.dialog-list__header {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: none;
+  padding: 15px 14px 12px;
+  border-bottom: 1px solid var(--color-border-soft);
+}
+
+.dialog-list__heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dialog-list__title {
+  font-size: 15px;
+  font-weight: 620;
+}
+
+.dialog-list__count {
+  display: grid;
+  place-items: center;
+  min-width: 22px;
+  height: 20px;
+  padding: 0 7px;
+  border-radius: var(--radius-full);
+  background-color: rgba(148, 163, 184, 0.12);
+  color: var(--color-text-soft);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* Поиск */
+.dialog-list__search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 34px;
+  padding: 0 11px;
+  background-color: rgba(148, 163, 184, 0.06);
+  border: 1px solid var(--color-border-soft);
+  border-radius: 10px;
+  transition:
+    border-color 140ms ease,
+    background-color 140ms ease;
+}
+
+.dialog-list__search:focus-within {
+  background-color: rgba(148, 163, 184, 0.09);
+  border-color: rgba(124, 58, 237, 0.55);
+}
+
+.dialog-list__search-icon {
+  flex: none;
+  color: var(--color-text-soft);
+}
+
+.dialog-list__search-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  border: 0;
+  background: none;
+  color: var(--color-text);
+  font-size: 12.5px;
+  outline: none;
+}
+
+.dialog-list__search-input::placeholder {
+  color: var(--color-text-soft);
+}
+
+.dialog-list__search-input::-webkit-search-cancel-button {
+  appearance: none;
+}
+
+/* Фильтры */
+.dialog-list__filters {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.dialog-list__filter {
+  display: inline-flex;
+  align-items: center;
+  height: 26px;
+  padding: 0 10px;
+  background-color: rgba(148, 163, 184, 0.06);
+  border: 1px solid var(--color-border-soft);
+  border-radius: var(--radius-full);
+  color: var(--color-text-muted);
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 140ms ease,
+    border-color 140ms ease,
+    color 140ms ease;
+}
+
+.dialog-list__filter:hover {
+  background-color: rgba(148, 163, 184, 0.1);
+  color: var(--color-text);
+}
+
+.dialog-list__filter--active,
+.dialog-list__filter--active:hover {
+  background-color: var(--color-violet-soft);
+  border-color: rgba(167, 139, 250, 0.45);
+  color: var(--color-violet-ink);
+}
+
+/* Список */
+.dialog-list__items {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+.dialog-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+  padding: 10px;
+  background-color: transparent;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background-color 140ms ease,
+    border-color 140ms ease;
+}
+
+.dialog-item:hover {
+  background-color: rgba(148, 163, 184, 0.06);
+}
+
+/* Активный диалог — blue-purple highlight */
+.dialog-item--active,
+.dialog-item--active:hover {
+  background-image: linear-gradient(
+    135deg,
+    rgba(37, 99, 235, 0.24),
+    rgba(124, 58, 237, 0.22)
+  );
+  border-color: rgba(139, 92, 246, 0.42);
+  box-shadow: 0 12px 26px -22px rgba(37, 99, 235, 0.95);
+}
+
+.dialog-item__avatar {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 32px;
+  height: 32px;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 50%;
+  background-image: linear-gradient(
+    135deg,
+    rgba(37, 99, 235, 0.32),
+    rgba(124, 58, 237, 0.32)
+  );
+  color: #e2e8f5;
+  font-size: 12px;
+  font-weight: 620;
+}
+
+.dialog-item__body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.dialog-item__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 0;
+}
+
+.dialog-item__name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dialog-item__time {
+  flex: none;
+  font-size: 10.5px;
+  color: var(--color-text-soft);
+}
+
+.dialog-item__request {
+  font-size: 11.5px;
+  color: var(--color-text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dialog-item__preview {
+  font-size: 11.5px;
+  color: var(--color-text-soft);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dialog-item--active .dialog-item__name {
+  color: #ffffff;
+}
+
+.dialog-item--active .dialog-item__preview {
+  color: var(--color-text-muted);
+}
+
+/* Пустой результат */
+.dialog-list__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex: 1 1 auto;
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--color-text-soft);
+}
+
+.dialog-list__empty-title {
+  margin: 8px 0 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.dialog-list__empty-text {
+  margin: 0;
+  font-size: 11.5px;
+}
