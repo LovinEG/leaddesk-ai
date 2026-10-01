@@ -1,0 +1,187 @@
+.leads-table {
+  --card-padding: 0;
+
+  overflow: hidden;
+}
+
+.leads-table__scroll {
+  overflow-x: auto;
+}
+
+/* Сетка колонок */
+.leads-table__head,
+.leads-table__row {
+  display: grid;
+  grid-template-columns:
+    minmax(170px, 1.4fr)
+    minmax(110px, 1fr)
+    minmax(120px, 0.9fr)
+    minmax(120px, 0.9fr)
+    minmax(150px, 0.9fr)
+    minmax(130px, 0.8fr);
+  align-items: center;
+  gap: 16px;
+  min-width: 900px;
+  padding: 0 20px;
+}
+
+.leads-table__head {
+  padding-top: 11px;
+  padding-bottom: 11px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-soft);
+}
+
+.leads-table__head > span:last-child {
+  justify-self: end;
+}
+
+.leads-table__list {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Строка */
+.leads-table__row {
+  padding-top: 11px;
+  padding-bottom: 11px;
+  border-top: 1px solid var(--color-border-soft);
+  transition: background-color 140ms ease;
+}
+
+.leads-table__row:hover {
+  background-color: rgba(148, 163, 184, 0.055);
+}
+
+.leads-table__row:hover .leads-table__name {
+  color: #ffffff;
+}
+
+.leads-table__row:hover .leads-table__avatar {
+  border-color: rgba(167, 139, 250, 0.45);
+}
+
+/* Клиент */
+.leads-table__client {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.leads-table__avatar {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 30px;
+  height: 30px;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 50%;
+  background-image: linear-gradient(
+    135deg,
+    rgba(37, 99, 235, 0.32),
+    rgba(124, 58, 237, 0.32)
+  );
+  color: #e2e8f5;
+  font-size: 12px;
+  font-weight: 620;
+  transition: border-color 140ms ease;
+}
+
+.leads-table__name {
+  font-size: 13.5px;
+  font-weight: 550;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: color 140ms ease;
+}
+
+/* Запрос */
+.leads-table__request {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Источник */
+.leads-table__source {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  color: var(--color-text-soft);
+}
+
+.leads-table__source svg {
+  flex: none;
+  color: var(--color-cyan);
+  opacity: 0.85;
+}
+
+/* Бюджет */
+.leads-table__budget {
+  font-size: 13px;
+  font-weight: 550;
+  color: var(--color-text);
+  font-variant-numeric: tabular-nums;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.leads-table__budget-empty {
+  font-weight: 500;
+  color: var(--color-text-soft);
+}
+
+/* Статус */
+.leads-table__status {
+  display: flex;
+  align-items: center;
+}
+
+/* Активность */
+.leads-table__activity {
+  justify-self: end;
+  font-size: 12.5px;
+  color: var(--color-text-soft);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Пустой результат */
+.leads-table__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 44px 20px 48px;
+  border-top: 1px solid var(--color-border-soft);
+  color: var(--color-text-soft);
+}
+
+.leads-table__empty-title {
+  margin: 8px 0 0;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.leads-table__empty-text {
+  margin: 0;
+  font-size: 12.5px;
+}
+
+@media (max-width: 1180px) {
+  .leads-table__head,
+  .leads-table__row {
+    gap: 14px;
+    padding: 0 16px;
+  }
+}

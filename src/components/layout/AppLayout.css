@@ -1,0 +1,47 @@
+.app-shell {
+  --sidebar-column: var(--sidebar-width);
+
+  display: grid;
+  grid-template-columns: var(--sidebar-column) minmax(0, 1fr);
+  min-height: 100vh;
+  background-color: var(--color-canvas);
+}
+
+.app-main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.app-content {
+  flex: 1 1 auto;
+  width: 100%;
+  max-width: var(--content-max-width);
+  padding: 26px 30px 52px;
+}
+
+.app-content > * {
+  min-width: 0;
+}
+
+/* Планшет: сайдбар сжимается до полосы с иконками (см. Sidebar.css) */
+@media (max-width: 1180px) {
+  .app-shell {
+    --sidebar-column: var(--sidebar-rail-width);
+  }
+
+  .app-content {
+    padding: 22px 22px 44px;
+  }
+}
+
+/* Узкий планшет: навигация уезжает наверх (см. Sidebar.css) */
+@media (max-width: 900px) {
+  .app-shell {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .app-content {
+    padding: 18px 16px 40px;
+  }
+}

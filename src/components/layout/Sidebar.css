@@ -1,0 +1,221 @@
+.sidebar {
+  position: sticky;
+  top: 0;
+  align-self: start;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  height: 100vh;
+  padding: 20px 14px;
+  background-color: var(--color-sidebar);
+  border-right: 1px solid var(--color-border-soft);
+}
+
+/* Бренд */
+.sidebar__brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 6px;
+  border-radius: var(--radius-sm);
+}
+
+.sidebar__brand-mark {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background-image: var(--gradient-brand);
+  color: #ffffff;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  box-shadow: var(--glow-violet);
+}
+
+.sidebar__brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+  min-width: 0;
+}
+
+.sidebar__brand-name {
+  font-size: 14px;
+  font-weight: 620;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+.sidebar__brand-tag {
+  font-size: 11px;
+  color: var(--color-text-soft);
+  white-space: nowrap;
+}
+
+/* Навигация */
+.sidebar__nav {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.sidebar__eyebrow {
+  margin: 0;
+  padding: 0 10px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--color-text-soft);
+}
+
+.sidebar__list {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.sidebar__link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  color: var(--color-text-muted);
+  font-size: 13.5px;
+  font-weight: 500;
+  transition:
+    background-color 140ms ease,
+    border-color 140ms ease,
+    color 140ms ease;
+}
+
+.sidebar__link:hover {
+  background-color: var(--color-hover);
+  color: var(--color-text);
+}
+
+.sidebar__link--active,
+.sidebar__link--active:hover {
+  background-image: var(--gradient-brand);
+  border-color: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+  font-weight: 600;
+  box-shadow: var(--glow-blue);
+}
+
+.sidebar__icon {
+  flex: none;
+  color: var(--color-text-soft);
+  transition: color 140ms ease;
+}
+
+.sidebar__link:hover .sidebar__icon {
+  color: var(--color-text-muted);
+}
+
+.sidebar__link--active .sidebar__icon {
+  color: #ffffff;
+}
+
+/* Футер с индикатором статуса */
+.sidebar__footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 10px;
+  border: 1px solid var(--color-border-soft);
+  border-radius: 10px;
+  background-color: rgba(148, 163, 184, 0.04);
+}
+
+.sidebar__status-dot {
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--color-cyan);
+  box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.16);
+}
+
+.sidebar__status-text {
+  font-size: 11.5px;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+/* Планшет: сайдбар превращается в узкую полосу с иконками */
+@media (max-width: 1180px) {
+  .sidebar {
+    align-items: center;
+    gap: 18px;
+    padding: 18px 12px;
+  }
+
+  .sidebar__brand {
+    padding: 0;
+  }
+
+  .sidebar__eyebrow,
+  .sidebar__brand-text,
+  .sidebar__label,
+  .sidebar__status-text {
+    display: none;
+  }
+
+  .sidebar__footer {
+    display: none;
+  }
+
+  .sidebar__link {
+    justify-content: center;
+    padding: 9px;
+  }
+}
+
+/* Узкий планшет: сайдбар становится горизонтальной навигацией сверху */
+@media (max-width: 900px) {
+  .sidebar {
+    position: static;
+    flex-direction: row;
+    align-items: center;
+    gap: 14px;
+    height: auto;
+    padding: 11px 16px;
+    border-right: 0;
+    border-bottom: 1px solid var(--color-border-soft);
+  }
+
+  .sidebar__brand-text,
+  .sidebar__label {
+    display: inline;
+  }
+
+  .sidebar__brand-tag {
+    display: none;
+  }
+
+  .sidebar__nav {
+    flex: 1 1 auto;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  .sidebar__list {
+    flex-direction: row;
+    gap: 4px;
+  }
+
+  .sidebar__link {
+    padding: 8px 12px;
+    white-space: nowrap;
+  }
+}

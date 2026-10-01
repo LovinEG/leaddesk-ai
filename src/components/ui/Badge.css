@@ -1,0 +1,66 @@
+.badge {
+  --badge-bg: rgba(148, 163, 184, 0.1);
+  --badge-border: var(--color-border-soft);
+  --badge-text: var(--color-text-muted);
+  --badge-dot: currentColor;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+  padding: 3px 10px;
+  border: 1px solid var(--badge-border);
+  border-radius: var(--radius-full);
+  background-color: var(--badge-bg);
+  color: var(--badge-text);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.badge::before {
+  content: '';
+  flex: none;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background-color: var(--badge-dot);
+}
+
+/* HOT — единственный градиентный статус */
+.badge--hot {
+  --badge-bg: transparent;
+  --badge-border: rgba(255, 255, 255, 0.16);
+  --badge-text: #ffffff;
+
+  background-image: var(--gradient-brand);
+}
+
+/* AI общается — blue */
+.badge--ai {
+  --badge-bg: var(--color-blue-soft);
+  --badge-border: rgba(96, 165, 250, 0.28);
+  --badge-text: var(--color-blue-ink);
+}
+
+/* NEW — сдержанный серо-синий */
+.badge--new {
+  --badge-bg: rgba(148, 163, 184, 0.1);
+  --badge-border: var(--color-border-soft);
+  --badge-text: #b8c4da;
+}
+
+/* QUALIFIED — violet */
+.badge--qualified {
+  --badge-bg: var(--color-violet-soft);
+  --badge-border: rgba(167, 139, 250, 0.3);
+  --badge-text: var(--color-violet-ink);
+}
+
+/* HUMAN_TAKEOVER — cyan (нужен ответ менеджера) */
+.badge--takeover {
+  --badge-bg: var(--color-cyan-soft);
+  --badge-border: rgba(103, 232, 249, 0.3);
+  --badge-text: var(--color-cyan-ink);
+}

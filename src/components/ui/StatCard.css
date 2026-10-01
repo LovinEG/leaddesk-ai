@@ -1,0 +1,110 @@
+.stat-card {
+  --card-padding: 16px 18px 12px;
+  --stat-ink: var(--color-blue-ink);
+  --stat-soft: var(--color-blue-soft);
+  --stat-glow: rgba(37, 99, 235, 0.34);
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow: hidden;
+  transition:
+    border-color 160ms ease,
+    transform 160ms ease;
+}
+
+.stat-card:hover {
+  border-color: var(--color-border-strong);
+  transform: translateY(-1px);
+}
+
+/* Мягкое цветное свечение в углу карточки */
+.stat-card::after {
+  content: '';
+  position: absolute;
+  top: -70px;
+  right: -50px;
+  width: 170px;
+  height: 170px;
+  border-radius: 50%;
+  background-image: radial-gradient(circle, var(--stat-glow), transparent 68%);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.stat-card__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  position: relative;
+  z-index: 1;
+}
+
+.stat-card__label {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+}
+
+.stat-card__icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--color-border-soft);
+  border-radius: 9px;
+  background-color: var(--stat-soft);
+  color: var(--stat-ink);
+}
+
+.stat-card__value {
+  position: relative;
+  z-index: 1;
+  font-size: 27px;
+  font-weight: 620;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+  color: var(--color-text);
+}
+
+.stat-card__bottom {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  position: relative;
+  z-index: 1;
+}
+
+.stat-card__meta {
+  font-size: 11.5px;
+  color: var(--color-text-soft);
+}
+
+/* Варианты акцентов */
+.stat-card--blue {
+  --stat-ink: var(--color-blue-ink);
+  --stat-soft: var(--color-blue-soft);
+  --stat-glow: rgba(37, 99, 235, 0.34);
+}
+
+.stat-card--violet {
+  --stat-ink: var(--color-violet-ink);
+  --stat-soft: var(--color-violet-soft);
+  --stat-glow: rgba(124, 58, 237, 0.36);
+}
+
+.stat-card--purple {
+  --stat-ink: var(--color-purple-ink);
+  --stat-soft: var(--color-purple-soft);
+  --stat-glow: rgba(139, 92, 246, 0.36);
+}
+
+.stat-card--cyan {
+  --stat-ink: var(--color-cyan-ink);
+  --stat-soft: var(--color-cyan-soft);
+  --stat-glow: rgba(34, 211, 238, 0.28);
+}

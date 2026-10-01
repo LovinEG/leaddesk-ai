@@ -1,0 +1,27 @@
+.sparkline {
+  display: block;
+  flex: none;
+  overflow: visible;
+}
+
+.sparkline__line {
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.sparkline--blue {
+  color: var(--color-blue-ink);
+}
+
+.sparkline--violet {
+  color: var(--color-violet-ink);
+}
+
+.sparkline--purple {
+  color: var(--color-purple-ink);
+}
+
+.sparkline--cyan {
+  color: var(--color-cyan-ink);
+}

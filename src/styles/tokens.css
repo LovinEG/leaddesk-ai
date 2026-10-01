@@ -1,0 +1,73 @@
+:root {
+  color-scheme: dark;
+
+  /* Фон и поверхности (Gradient Dark) */
+  --color-canvas: #0b1020;
+  --color-canvas-deep: #080c18;
+  --color-sidebar: #080d1a;
+  --color-surface: #11182b;
+  --color-card: #151e34;
+  --color-elevated: #1b2440;
+  --color-hover: rgba(148, 163, 184, 0.08);
+  --color-hover-strong: rgba(148, 163, 184, 0.13);
+
+  /* Полупрозрачные границы */
+  --color-border: rgba(148, 163, 184, 0.13);
+  --color-border-soft: rgba(148, 163, 184, 0.09);
+  --color-border-strong: rgba(148, 163, 184, 0.22);
+
+  /* Текст */
+  --color-text: #f8fafc;
+  --color-text-muted: #a3b0c9;
+  --color-text-soft: #7b88a4;
+
+  /* Акценты палитры */
+  --color-blue: #2563eb;
+  --color-violet: #7c3aed;
+  --color-purple: #8b5cf6;
+  --color-cyan: #22d3ee;
+
+  --color-blue-ink: #93c5fd;
+  --color-violet-ink: #c4b5fd;
+  --color-purple-ink: #d8c1fd;
+  --color-cyan-ink: #67e8f9;
+
+  --color-blue-soft: rgba(37, 99, 235, 0.16);
+  --color-violet-soft: rgba(124, 58, 237, 0.18);
+  --color-purple-soft: rgba(139, 92, 246, 0.18);
+  --color-cyan-soft: rgba(34, 211, 238, 0.14);
+
+  /* Градиенты (использовать точечно) */
+  --gradient-brand: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+  --gradient-brand-hover: linear-gradient(135deg, #3b76f6 0%, #8b5cf6 100%);
+  --gradient-hero: linear-gradient(
+    135deg,
+    rgba(37, 99, 235, 0.32) 0%,
+    rgba(124, 58, 237, 0.24) 52%,
+    rgba(34, 211, 238, 0.1) 100%
+  );
+
+  /* Тени */
+  --shadow-card:
+    0 1px 2px rgba(3, 6, 18, 0.45), 0 16px 34px -24px rgba(3, 6, 18, 0.95);
+  --shadow-raised:
+    0 1px 2px rgba(3, 6, 18, 0.5), 0 22px 46px -26px rgba(3, 6, 18, 1);
+  --glow-blue: 0 16px 34px -20px rgba(37, 99, 235, 0.85);
+  --glow-violet: 0 16px 34px -20px rgba(124, 58, 237, 0.9);
+
+  /* Скругления */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-full: 999px;
+
+  /* Каркас */
+  --sidebar-width: 258px;
+  --sidebar-rail-width: 76px;
+  --topbar-height: 64px;
+  --content-max-width: 1320px;
+
+  /* Типографика */
+  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial,
+    sans-serif;
+}
