@@ -29,7 +29,7 @@ export const NAV_ITEMS = [
   {
     to: '/ai-rules',
     label: 'AI Rules',
-    description: 'Правила квалификации лидов',
+    description: 'Поведение AI-ассистента и правила передачи менеджеру',
     icon: Bot,
   },
   {
