@@ -2,7 +2,6 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  max-width: 1180px;
 }
 
 /* Сетка: AI-сводка | Качество лида, параметры на всю ширину, заметки | история */

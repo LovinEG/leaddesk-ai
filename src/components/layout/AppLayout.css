@@ -18,7 +18,6 @@
   flex-direction: column;
   flex: 1 1 auto;
   width: 100%;
-  max-width: var(--content-max-width);
   padding: 26px 30px 52px;
 }
 
