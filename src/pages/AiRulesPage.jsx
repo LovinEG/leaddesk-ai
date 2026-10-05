@@ -15,14 +15,36 @@ import {
 import { useEffect, useState } from 'react'
 
 import Card from '../components/ui/Card.jsx'
+import { getCurrentBusiness } from '../lib/business.js'
 import {
+  DEFAULT_INSTRUCTIONS,
   HANDOFF_RULES,
   PREVIEW_DIALOG,
   QUALIFY_FIELDS,
   TONES,
   createDefaultAiRules,
 } from '../lib/aiRules.js'
+import { supabase } from '../lib/supabase.js'
 import './AiRulesPage.css'
+
+function flagsFromStoredValue(items, value) {
+  return Object.fromEntries(
+    items.map(({ id }) => [
+      id,
+      Array.isArray(value)
+        ? value.includes(id)
+        : value?.[id] === true,
+    ]),
+  )
+}
+
+function copySettings(settings) {
+  return {
+    ...settings,
+    qualify: { ...settings.qualify },
+    handoff: { ...settings.handoff },
+  }
+}
 
 function Switch({ checked, onChange, label }) {
   return (
@@ -58,7 +80,80 @@ function SectionHeader({ icon: Icon, title, hint, accent = 'violet' }) {
 
 function AiRulesPage() {
   const [settings, setSettings] = useState(createDefaultAiRules)
+  const [loadedSettings, setLoadedSettings] = useState(null)
+  const [businessId, setBusinessId] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [loadingError, setLoadingError] = useState('')
+  const [loadAttempt, setLoadAttempt] = useState(0)
+  const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState('')
   const [savedFlash, setSavedFlash] = useState(false)
+
+  useEffect(() => {
+    let active = true
+
+    async function loadSettings() {
+      setLoading(true)
+      setLoadingError('')
+      setSaveError('')
+
+      try {
+        const business = await getCurrentBusiness()
+        const { data, error } = await supabase
+          .from('ai_rules')
+          .select(
+            'business_id, active, tone, qualification_fields, handoff_rules, handoff_budget, instructions',
+          )
+          .eq('business_id', business.id)
+          .maybeSingle()
+
+        if (error) {
+          throw error
+        }
+
+        if (!data) {
+          throw new Error(
+            'Для текущего business_id не найдена строка ai_rules. Проверьте наличие настроек и политику RLS SELECT.',
+          )
+        }
+
+        const loaded = {
+          active: data.active ?? true,
+          tone: data.tone ?? 'friendly',
+          qualify: flagsFromStoredValue(
+            QUALIFY_FIELDS,
+            data.qualification_fields,
+          ),
+          handoff: flagsFromStoredValue(HANDOFF_RULES, data.handoff_rules),
+          budgetThreshold: String(data.handoff_budget ?? 8000),
+          instructions: data.instructions ?? DEFAULT_INSTRUCTIONS,
+        }
+
+        if (active) {
+          setBusinessId(business.id)
+          setSettings(copySettings(loaded))
+          setLoadedSettings(copySettings(loaded))
+          setSavedFlash(false)
+        }
+      } catch (error) {
+        if (active) {
+          setLoadingError(
+            error.message || 'Не удалось загрузить настройки AI.',
+          )
+        }
+      } finally {
+        if (active) {
+          setLoading(false)
+        }
+      }
+    }
+
+    loadSettings()
+
+    return () => {
+      active = false
+    }
+  }, [loadAttempt])
 
   useEffect(() => {
     if (!savedFlash) {
@@ -69,42 +164,141 @@ function AiRulesPage() {
     return () => window.clearTimeout(timer)
   }, [savedFlash])
 
-  const setTone = (tone) => setSettings((prev) => ({ ...prev, tone }))
+  const updateSettings = (updater) => {
+    setSettings((previous) => updater(previous))
+    setSavedFlash(false)
+    setSaveError('')
+  }
+
+  const setTone = (tone) =>
+    updateSettings((previous) => ({ ...previous, tone }))
 
   const toggleQualify = (id) =>
-    setSettings((prev) => ({
-      ...prev,
-      qualify: { ...prev.qualify, [id]: !prev.qualify[id] },
+    updateSettings((previous) => ({
+      ...previous,
+      qualify: { ...previous.qualify, [id]: !previous.qualify[id] },
     }))
 
   const toggleHandoff = (id) =>
-    setSettings((prev) => ({
-      ...prev,
-      handoff: { ...prev.handoff, [id]: !prev.handoff[id] },
+    updateSettings((previous) => ({
+      ...previous,
+      handoff: { ...previous.handoff, [id]: !previous.handoff[id] },
     }))
 
   const handleReset = () => {
-    setSettings(createDefaultAiRules())
+    if (!loadedSettings) {
+      return
+    }
+
+    setSettings(copySettings(loadedSettings))
     setSavedFlash(false)
+    setSaveError('')
   }
 
-  const handleSave = (event) => {
+  const handleSave = async (event) => {
     event.preventDefault()
-    setSavedFlash(true)
+    if (!businessId || !loadedSettings || saving) {
+      return
+    }
+
+    const budget = Number(settings.budgetThreshold)
+    if (!Number.isFinite(budget) || budget < 0) {
+      setSaveError('Порог бюджета должен быть числом не меньше нуля.')
+      setSavedFlash(false)
+      return
+    }
+
+    const payload = {
+      active: settings.active,
+      tone: settings.tone,
+      qualification_fields: QUALIFY_FIELDS.filter(
+        ({ id }) => settings.qualify[id],
+      ).map(({ id }) => id),
+      handoff_rules: Object.fromEntries(
+        HANDOFF_RULES.map(({ id }) => [id, settings.handoff[id] === true]),
+      ),
+      handoff_budget: budget,
+      instructions: settings.instructions,
+    }
+
+    setSaving(true)
+    setSaveError('')
+    setSavedFlash(false)
+
+    try {
+      const { data, error } = await supabase
+        .from('ai_rules')
+        .update(payload)
+        .eq('business_id', businessId)
+        .select(
+          'business_id, active, tone, qualification_fields, handoff_rules, handoff_budget, instructions',
+        )
+        .maybeSingle()
+
+      if (error) {
+        throw error
+      }
+
+      if (!data) {
+        throw new Error(
+          'Supabase обновил 0 строк. Проверьте, что строка ai_rules существует для этого business_id и что RLS разрешает пользователю SELECT и UPDATE этой строки.',
+        )
+      }
+
+      const saved = {
+        active: data.active ?? true,
+        tone: data.tone ?? 'friendly',
+        qualify: flagsFromStoredValue(
+          QUALIFY_FIELDS,
+          data.qualification_fields,
+        ),
+        handoff: flagsFromStoredValue(HANDOFF_RULES, data.handoff_rules),
+        budgetThreshold: String(data.handoff_budget ?? 8000),
+        instructions: data.instructions ?? DEFAULT_INSTRUCTIONS,
+      }
+
+      setSettings(copySettings(saved))
+      setLoadedSettings(copySettings(saved))
+      setSavedFlash(true)
+    } catch (error) {
+      setSaveError(error.message || 'Не удалось сохранить настройки AI.')
+    } finally {
+      setSaving(false)
+    }
   }
 
+  const hasChanges =
+    loadedSettings !== null &&
+    JSON.stringify(settings) !== JSON.stringify(loadedSettings)
   const previewReply = PREVIEW_DIALOG.replies[settings.tone]
   const toneLabel = TONES.find((tone) => tone.id === settings.tone)?.label
 
+  if (loading) {
+    return (
+      <div className="ai-rules__state" role="status">
+        <span className="ai-rules__spinner" aria-hidden="true" />
+        Загружаем настройки AI…
+      </div>
+    )
+  }
+
+  if (loadingError || !loadedSettings) {
+    return (
+      <div className="ai-rules__state ai-rules__state--error" role="alert">
+        <p>{loadingError || 'Настройки AI недоступны.'}</p>
+        <button
+          type="button"
+          className="ai-rules__reset"
+          onClick={() => setLoadAttempt((attempt) => attempt + 1)}
+        >
+          Повторить загрузку
+        </button>
+      </div>
+    )
+  }
+
   return (
     <form className="ai-rules" onSubmit={handleSave}>
-      {savedFlash ? (
-        <p className="ai-rules__toast" role="status">
-          <Check size={15} strokeWidth={2.2} aria-hidden="true" />
-          Настройки сохранены
-        </p>
-      ) : null}
-
       <div className="ai-rules__grid">
         <div className="ai-rules__main">
           <Card className="ai-rules__card ai-rules__card--active">
@@ -125,7 +319,10 @@ function AiRulesPage() {
                 checked={settings.active}
                 label="AI-ассистент активен"
                 onChange={() =>
-                  setSettings((prev) => ({ ...prev, active: !prev.active }))
+                  updateSettings((previous) => ({
+                    ...previous,
+                    active: !previous.active,
+                  }))
                 }
               />
             </div>
@@ -239,8 +436,8 @@ function AiRulesPage() {
                           value={settings.budgetThreshold}
                           disabled={!enabled}
                           onChange={(event) =>
-                            setSettings((prev) => ({
-                              ...prev,
+                            updateSettings((previous) => ({
+                              ...previous,
                               budgetThreshold: event.target.value,
                             }))
                           }
@@ -266,8 +463,8 @@ function AiRulesPage() {
               className="ai-rules__textarea"
               value={settings.instructions}
               onChange={(event) =>
-                setSettings((prev) => ({
-                  ...prev,
+                updateSettings((previous) => ({
+                  ...previous,
                   instructions: event.target.value,
                 }))
               }
@@ -276,17 +473,6 @@ function AiRulesPage() {
             />
           </Card>
 
-          <div className="ai-rules__actions">
-            <button type="button" className="ai-rules__reset" onClick={handleReset}>
-              <RotateCcw size={15} strokeWidth={1.9} aria-hidden="true" />
-              Сбросить
-            </button>
-
-            <button type="submit" className="ai-rules__save">
-              <Save size={15} strokeWidth={1.9} aria-hidden="true" />
-              Сохранить настройки
-            </button>
-          </div>
         </div>
 
         <aside className="ai-rules__aside">
@@ -334,6 +520,57 @@ function AiRulesPage() {
             </p>
           </Card>
         </aside>
+      </div>
+
+      {saveError ? (
+        <p className="ai-rules__error" role="alert">
+          {saveError}
+        </p>
+      ) : null}
+
+      <div className="ai-rules__actions">
+        <span
+          className={
+            hasChanges
+              ? 'ai-rules__save-state ai-rules__save-state--dirty'
+              : 'ai-rules__save-state'
+          }
+          role="status"
+          aria-live="polite"
+        >
+          {hasChanges
+            ? 'Есть несохранённые изменения'
+            : 'Все изменения сохранены'}
+        </span>
+
+        <div className="ai-rules__action-buttons">
+          <button
+            type="button"
+            className="ai-rules__reset"
+            onClick={handleReset}
+            disabled={!hasChanges || saving}
+          >
+            <RotateCcw size={15} strokeWidth={1.9} aria-hidden="true" />
+            Сбросить
+          </button>
+
+          <button
+            type="submit"
+            className="ai-rules__save"
+            disabled={!hasChanges || saving}
+          >
+            {saving ? (
+              <span className="ai-rules__button-spinner" aria-hidden="true" />
+            ) : (
+              <Save size={15} strokeWidth={1.9} aria-hidden="true" />
+            )}
+            {saving
+              ? 'Сохраняем…'
+              : savedFlash
+                ? 'Настройки сохранены'
+                : 'Сохранить настройки'}
+          </button>
+        </div>
       </div>
     </form>
   )
