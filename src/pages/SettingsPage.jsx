@@ -22,9 +22,10 @@ import {
   COMPANY_FIELDS,
   FOLLOWUP_PREVIEW,
   NOTIFICATION_ITEMS,
-  TELEGRAM_DEFAULTS,
   createDefaultSettings,
 } from '../lib/settings.js'
+import { getCurrentBusiness } from '../lib/business.js'
+import { supabase } from '../lib/supabase.js'
 import './SettingsPage.css'
 function Switch({ checked, onChange, label }) {
   return (
@@ -73,12 +74,91 @@ function Field({ label, value, onChange, type = 'text', span = false, min }) {
   )
 }
 function SettingsPage() {
-  const [settings, setSettings] = useState(createDefaultSettings)
-  const [isTelegramConnected, setIsTelegramConnected] = useState(
-    TELEGRAM_DEFAULTS.connected,
-  )
+  const [settings, setSettings] = useState(null)
+  const [isTelegramConnected, setIsTelegramConnected] = useState(false)
+  const [savedState, setSavedState] = useState(null)
+  const [business, setBusiness] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState('')
+  const [saveError, setSaveError] = useState('')
+  const [saving, setSaving] = useState(false)
+  const [reloadKey, setReloadKey] = useState(0)
   const [flash, setFlash] = useState(false)
   const [clearState, setClearState] = useState('idle')
+
+  useEffect(() => {
+    let active = true
+
+    async function loadSettings() {
+      setLoading(true)
+      setLoadError('')
+
+      try {
+        const currentBusiness = await getCurrentBusiness()
+        const { data: businessSettings, error } = await supabase
+          .from('business_settings')
+          .select(
+            'business_id, telegram_connected, telegram_username, notifications, followup_enabled, followup_delay_minutes, followup_max_attempts',
+          )
+          .eq('business_id', currentBusiness.id)
+          .single()
+
+        if (error) {
+          throw error
+        }
+
+        const defaults = createDefaultSettings()
+        const loadedSettings = {
+          company: {
+            name: currentBusiness.name ?? '',
+            city: currentBusiness.city ?? '',
+            phone: currentBusiness.phone ?? '',
+            telegram: currentBusiness.telegram_username ?? '',
+            hours: currentBusiness.working_hours ?? '',
+          },
+          telegramUsername:
+            businessSettings.telegram_username ??
+            currentBusiness.telegram_username ??
+            '',
+          notifications: {
+            ...defaults.notifications,
+            ...(businessSettings.notifications ?? {}),
+          },
+          followUp: {
+            enabled: businessSettings.followup_enabled,
+            minutes: businessSettings.followup_delay_minutes,
+            attempts: businessSettings.followup_max_attempts,
+          },
+        }
+        const loadedTelegramConnected = businessSettings.telegram_connected
+
+        if (active) {
+          setBusiness(currentBusiness)
+          setSettings(loadedSettings)
+          setIsTelegramConnected(loadedTelegramConnected)
+          setSavedState({
+            settings: loadedSettings,
+            isTelegramConnected: loadedTelegramConnected,
+          })
+        }
+      } catch (error) {
+        if (active) {
+          setLoadError(error.message || 'Не удалось загрузить настройки.')
+        }
+      } finally {
+        if (active) {
+          setLoading(false)
+        }
+      }
+    }
+
+    loadSettings()
+
+    return () => {
+      active = false
+    }
+  }, [reloadKey])
+
   useEffect(() => {
     if (!flash) {
       return undefined
@@ -101,19 +181,133 @@ function SettingsPage() {
       ...prev,
       followUp: { ...prev.followUp, ...patch },
     }))
+
   const handleCancel = () => {
-    setSettings(createDefaultSettings())
-    setIsTelegramConnected(TELEGRAM_DEFAULTS.connected)
+    if (!savedState) {
+      return
+    }
+
+    setSettings(savedState.settings)
+    setIsTelegramConnected(savedState.isTelegramConnected)
+    setSaveError('')
     setClearState('idle')
     setFlash(false)
   }
-  const handleSave = (event) => {
+
+  const handleSave = async (event) => {
     event.preventDefault()
-    setFlash(true)
+    if (!business || !settings) {
+      return
+    }
+
+    setSaving(true)
+    setSaveError('')
+    setFlash(false)
+
+    let companySaved = false
+
+    try {
+      const { data: updatedBusiness, error: businessError } = await supabase
+        .from('businesses')
+        .update({
+          name: settings.company.name,
+          city: settings.company.city,
+          phone: settings.company.phone,
+          telegram_username: settings.company.telegram,
+          working_hours: settings.company.hours,
+        })
+        .eq('id', business.id)
+        .select('id')
+        .maybeSingle()
+
+      if (businessError) {
+        throw businessError
+      }
+
+      if (!updatedBusiness) {
+        throw new Error('Нет доступа к обновлению данных компании.')
+      }
+
+      companySaved = true
+
+      const { data: updatedSettings, error: settingsError } = await supabase
+        .from('business_settings')
+        .update({
+          telegram_connected: isTelegramConnected,
+          telegram_username: settings.company.telegram,
+          notifications: settings.notifications,
+          followup_enabled: settings.followUp.enabled,
+          followup_delay_minutes: Number(settings.followUp.minutes),
+          followup_max_attempts: Number(settings.followUp.attempts),
+        })
+        .eq('business_id', business.id)
+        .select('business_id')
+        .maybeSingle()
+
+      if (settingsError) {
+        throw settingsError
+      }
+
+      if (!updatedSettings) {
+        throw new Error('Нет доступа к обновлению настроек бизнеса.')
+      }
+
+      const savedSettings = {
+        ...settings,
+        telegramUsername: settings.company.telegram,
+      }
+
+      setSettings(savedSettings)
+      setSavedState({
+        settings: savedSettings,
+        isTelegramConnected,
+      })
+      setFlash(true)
+    } catch (error) {
+      const message = error.message || 'Не удалось сохранить настройки.'
+      setSaveError(
+        companySaved
+          ? `Данные компании сохранены, но настройки не сохранены: ${message}`
+          : message,
+      )
+    } finally {
+      setSaving(false)
+    }
   }
+
+  if (loading) {
+    return (
+      <div className="settings__state" role="status">
+        <span className="settings__spinner" aria-hidden="true" />
+        Загружаем настройки компании…
+      </div>
+    )
+  }
+
+  if (loadError || !settings) {
+    return (
+      <div className="settings__state settings__state--error" role="alert">
+        <p>{loadError || 'Настройки компании недоступны.'}</p>
+        <button
+          type="button"
+          className="settings__btn"
+          onClick={() => setReloadKey((key) => key + 1)}
+        >
+          Повторить загрузку
+        </button>
+      </div>
+    )
+  }
+
   const integrationsCount = isTelegramConnected ? 1 : 0
+
   return (
     <form className="settings" onSubmit={handleSave}>
+      {saveError ? (
+        <p className="settings__error" role="alert">
+          {saveError}
+        </p>
+      ) : null}
       {flash ? (
         <p className="settings__toast" role="status">
           <Check size={15} strokeWidth={2.2} aria-hidden="true" />
@@ -220,7 +414,7 @@ function SettingsPage() {
               </span>
               <div className="settings__tg-copy">
                 <span className="settings__tg-name">
-                  {TELEGRAM_DEFAULTS.username}
+                  {settings.telegramUsername || 'Telegram не указан'}
                 </span>
                 <span
                   className={
@@ -341,9 +535,9 @@ function SettingsPage() {
           <RotateCcw size={15} strokeWidth={1.9} aria-hidden="true" />
           Отменить изменения
         </button>
-        <button type="submit" className="settings__save">
+        <button type="submit" className="settings__save" disabled={saving}>
           <Save size={15} strokeWidth={1.9} aria-hidden="true" />
-          Сохранить настройки
+          {saving ? 'Сохраняем…' : 'Сохранить настройки'}
         </button>
       </div>
     </form>
